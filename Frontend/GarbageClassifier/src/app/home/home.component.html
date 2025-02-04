@@ -1,0 +1,61 @@
+<div class="container">
+  <header class="header">
+    <h1 class="title">Garbage Classifier</h1>
+    <p class="subtitle">Upload an image to classify waste materials</p>
+  </header>
+
+  <mat-card class="main-card">
+    <div class="content">
+      <!-- Left Section: Image Upload and Preview -->
+      <div class="upload-section">
+        <mat-card class="upload-box" (click)="triggerFileInput()" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" id="file-upload" hidden />
+          <ng-container *ngIf="!previewUrl; else imagePreview">
+            <mat-icon class="upload-icon">cloud_upload</mat-icon>
+            <p class="upload-text">Click or Drag & Drop to Upload</p>
+          </ng-container>
+          <ng-template #imagePreview>
+            <img [src]="previewUrl" alt="Uploaded Image Preview" class="uploaded-image" />
+          </ng-template>
+        </mat-card>
+        <button mat-raised-button color="primary" class="identify-button" (click)="onIdentify()" [disabled]="!selectedFile">
+          Identify Image
+        </button>
+      </div>
+
+      <!-- Right Section: Identification Result -->
+      <div class="result-section">
+        <mat-card class="result-card">
+          <h2 class="result-title">Classification Result</h2>
+
+          <!-- Animated Loader -->
+          <ng-container *ngIf="isLoading; else showResult">
+            <div class="loading-container">
+              <mat-progress-spinner mode="indeterminate" diameter="50" color="accent"></mat-progress-spinner>
+              <p class="loading-text">Analyzing Image...</p>
+              <div class="waste-hints">
+                <span class="hint-text" *ngFor="let hint of loadingHints; let i = index"
+                      [ngStyle]="{'opacity': i === currentHintIndex ? '1' : '0'}">
+                  {{ hint }}
+                </span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Show Identified Object -->
+          <ng-template #showResult>
+            <div *ngIf="identifiedObject; else placeholder">
+              <p class="success-text">Identified as:</p>
+              <div class="identified-card">
+                <strong class="highlight">{{ identifiedObject }}</strong>
+              </div>
+            </div>
+            <ng-template #placeholder>
+              <p class="default-message">Upload an image and click "Identify Image" to get started.</p>
+            </ng-template>
+          </ng-template>
+        </mat-card>
+      </div>
+    </div>
+  </mat-card>
+</div>
