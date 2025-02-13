@@ -1,0 +1,23 @@
+
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile  
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Backend:/app
+    restart: always
+    environment:
+      - UVICORN_CMD="GarbageClassifierAPI:app"
+
+  frontend:
+    build:
+      context:  ./Frontend/GarbageClassifier
+      dockerfile: Dockerfile  
+    ports:
+      - "4200:80"
+    restart: always
+    depends_on:
+      - backend  
