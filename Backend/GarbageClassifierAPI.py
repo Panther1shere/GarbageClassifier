@@ -7,9 +7,20 @@ from io import BytesIO
 from PIL import Image
 from fastapi.middleware.cors import CORSMiddleware
 
+"""
+Author: Kumawat Mohit , Fulara Utkarsh
+Date: 27-02-2025
+Purpose: This file contains the code for the FastAPI server that will serve the trained model.
+"""
+
+# Run the API server (use this command in terminal)
+# uvicorn filename:app --host 0.0.0.0 --port 8000 --reload
+
+
 # Initialize FastAPI app
 app = FastAPI()
 
+# Add CORS middleware to allow cross-origin requests from the frontend on localhost:4200
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins (change this in production)
@@ -17,6 +28,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
+
 
 # Load the trained model
 model = tf.keras.models.load_model('model_12_classes.keras')
@@ -28,6 +40,7 @@ with open('class_indices.json', 'r') as f:
 # Convert class indices back to a list
 class_names = [class_indices[str(i)] for i in range(len(class_indices))]
 
+# Define a function to preprocess the image received from the frontend
 def preprocess_image(image_data):
     """Preprocesses the image for model prediction."""
     img = Image.open(BytesIO(image_data))
@@ -36,12 +49,14 @@ def preprocess_image(image_data):
     img = np.expand_dims(img, axis=0)  # Add batch dimension
     return img
 
+# Define the prediction endpoint with a POST request. The endpoint receives an image file and returns the predicted class.
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
     """
     Receives an image file, runs the model prediction, and returns the predicted class.
     """
     try:
+
         # Read image data
         image_data = await file.read()
         img = preprocess_image(image_data)
@@ -53,8 +68,8 @@ async def predict(file: UploadFile = File(...)):
 
         return {"predicted_class": predicted_class}
 
+
     except Exception as e:
         return {"error": str(e)}
 
-# Run the API server (use this command in terminal)
-# uvicorn filename:app --host 0.0.0.0 --port 8000 --reload
+

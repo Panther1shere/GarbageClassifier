@@ -4,6 +4,16 @@ import numpy as np
 from tensorflow.keras.preprocessing import image
 
 
+
+"""
+Author: Kumawat Mohit , Fulara Utkarsh
+Date: 27-02-2025
+Purpose: This file contains the code. We have first learned to develop a model for distinguishing Cat and dog. 
+Which when understood can be used to develop a model for garbage classification. Basically this is a very basic
+code for understanding the working of CNN and how to develop a model for image classification. This is not a 
+part of the orignal classifier and should only be read if you want to just get the fundamentals right. 
+"""
+
 def preprocess_data():
     """
     Loads and preprocesses training and test datasets.

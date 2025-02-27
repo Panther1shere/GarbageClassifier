@@ -12,6 +12,14 @@ import os
 import json
 
 
+"""
+Author: Kumawat Mohit , Fulara Utkarsh
+Date: 27-02-2025
+Purpose: This file contains the code for training the garbage classification model.
+"""
+
+
+# Check if GPU is available - Used to check if the model is running on GPU or not.
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 print("Gpu found successfully")
 
@@ -19,12 +27,12 @@ print("Gpu found successfully")
 def preprocess_data():
     """
     Loads and preprocesses the dataset by splitting it into training (75%) & validation (25%) sets.
-    Applies stronger **data augmentation**.
+    Applies data augmentation to prevent Overfitting.
     """
 
     dataset_path = 'garbage_classification'
 
-    # Data Augmentation Pipeline
+    # Data Augmentation
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1. / 255,
         rotation_range=30,
@@ -48,7 +56,7 @@ def preprocess_data():
     )
 
 
-    # Load Validation Set (No Augmentation Here)
+    # Load Validation Set (No Augmentation Here for checking the model performance on real data)
     validation_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255, validation_split=0.25)
     validation_set = validation_datagen.flow_from_directory(
         dataset_path,
@@ -61,7 +69,8 @@ def preprocess_data():
 
     return training_set, validation_set, training_set.class_indices
 
-
+""" This Method is used to build the CNN model. 
+ The model consists of 3 Convolutional Layers, 2 Max Pooling Layers, 2 Dense Layers, and 1 Output Layer."""
 def build_cnn_network():
     model = tf.keras.models.Sequential([
         layers.Conv2D(32, (3, 3), activation='swish', input_shape=(128, 128, 3)),
@@ -85,7 +94,7 @@ def build_cnn_network():
         layers.GlobalAveragePooling2D(),
 
         layers.Dense(512, activation='swish'),
-        layers.Dropout(0.3),  # ✅ Reduced dropout for better regularization
+        layers.Dropout(0.3),  #  Reduced dropout for better regularization
         layers.Dense(12, activation='softmax')
     ])
     return model
@@ -94,7 +103,8 @@ def build_cnn_network():
 def train_and_save_model():
     """
     Trains the CNN on the preprocessed dataset for 12 classes and saves the trained model.
-    If a previously trained model exists, it loads the weights instead of training from scratch.
+    If a previously trained model exists, it loads the weights instead of training from scratch. Also
+    called Transfer Learning.
     """
     training_set, validation_set, class_indices = preprocess_data()
     print(f"Number of classes detected: {len(class_indices)}")
@@ -104,9 +114,11 @@ def train_and_save_model():
 
     model_path = 'model_12_classes.keras'
     if os.path.exists(model_path):
-        print("🔄 Loading existing model weights...")
+        print(" Loading existing model weights...")
         cnn.load_weights(model_path)
 
+    # Compile the CNN Model with AdamW optimizer. Defined the learning rate and weight decay.
+    # Also, used categorical crossentropy as the loss function.
     cnn.compile(optimizer=AdamW(learning_rate=0.0005, weight_decay=5e-5),
                 loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -117,44 +129,49 @@ def train_and_save_model():
     early_stopping = EarlyStopping(monitor='val_loss', patience=7, restore_best_weights=True)
 
     # Train the CNN Model
-    print("🚀 Training the CNN model...")
+    print(" Training the CNN model...")
     cnn.fit(training_set, validation_data=validation_set, epochs=50, callbacks=[early_stopping, lr_scheduler])
 
     # Save the trained model
     cnn.save(model_path)
-    print(f"✅ Model saved as '{model_path}'.")
+    print(f" Model saved as '{model_path}'.")
 
 
+
+""" This method is used to load the trained model and predict the class of a given image. """
 def load_model_and_predict(image_path):
     """
     Loads the trained model and predicts the class of a given image.
     """
-    # ✅ Load the trained model
+    #  Load the trained model
     model = tf.keras.models.load_model('model_12_classes.keras')
 
 
-    # ✅ Load class names from JSON file
+    #  Load class names from JSON file
     with open('class_indices.json', 'r') as f:
         class_indices = json.load(f)
 
     # Convert class indices back to a list
     class_names = [class_indices[str(i)] for i in range(len(class_indices))]
 
-    # ✅ Load & preprocess the image
+    #  Load & preprocess the image
     img = image.load_img(image_path, target_size=(128, 128))
     img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0) / 255.0  # Normalize
 
-    # ✅ Predict class probabilities
+    #  Predict class probabilities
     result = model.predict(img)
     predicted_index = np.argmax(result)
 
-    # ✅ Get the predicted class name
+    #  Get the predicted class name
     predicted_class = class_names[predicted_index]
 
-    print(f"✅ Predicted Class: {predicted_class}")
+    print(f" Predicted Class: {predicted_class}")
 
 
+
+""" This method is used to save the class indices to a JSON file. Which would be used in the 
+future to get the class name for a given index. """
 def SaveIndices(dataset_path):
     class_names = sorted(os.listdir(dataset_path))
 
@@ -165,7 +182,8 @@ def SaveIndices(dataset_path):
     with open("class_indices.json", "w") as f:
         json.dump(class_indices, f)
 
-    print("✅ Class indices saved successfully!")
+    print(" Class indices saved successfully!")
+
 
 
 if __name__ == '__main__':

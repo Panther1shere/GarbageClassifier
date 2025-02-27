@@ -10,6 +10,15 @@ import tensorflow as tf
 import os
 import json
 
+
+"""
+Author: Kumawat Mohit , Fulara Utkarsh
+Date: 27-02-2025
+Purpose: This file contains for loading the trained model and predict the class This should basically
+be used if you do not want to try frontend and just play around from the controller and the code otherwise for
+the api request we have a seperate file named GarbageClassifierAPI.py.
+"""
+
 def load_model_and_predict(image_path):
     """
     Loads the trained model and predicts the class of a given image.
