@@ -3,8 +3,7 @@ Running the Dockerized Application : Our application is now fully Dockerized, re
 Step 1: Install "Docker Desktop" from Docker’s official site and ensure it is running in the background.
 
 Step 2: Navigate to the project directory where docker-compose.yml is located:
-
-cd /path/to/project  
+        cd /path/to/project  
 
 Step 3: Verify that docker-compose.yml is present in the directory.
 
