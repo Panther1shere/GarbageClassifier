@@ -7,6 +7,15 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatIcon} from '@angular/material/icon';
 import {ApiService} from '../apiService/api.service';
 
+
+/**
+ * Author: Kumawat Mohit, Fulara Utkarsh
+ * Date: 27-02-2025
+ * Purpose: This is the Typescript file for the home component. Consists of all the methods for the home component.
+ * All the logic and request to backend is sent from here
+ */
+
+
 @Component({
   selector: 'app-home',
   imports: [MatCardModule, MatButton, NgIf, HttpClientModule, MatProgressSpinner, MatIcon, NgForOf, NgStyle],

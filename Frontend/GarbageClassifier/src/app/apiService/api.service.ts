@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
 
+
+
+/**
+ * Author: Kumawat Mohit, Fulara Utkarsh
+ * Date: 27-02-2025
+ * Purpose: This is the service class for the API. The Post request is made from here to the backend.
+ */
+
 @Injectable({
   providedIn: 'root'
 })
